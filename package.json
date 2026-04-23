@@ -1,0 +1,9 @@
+{
+  "name": "muse-store-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "cd telegram-bot && npm install && npm run build",
+    "start": "cd telegram-bot && npm run start"
+  }
+}
