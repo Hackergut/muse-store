@@ -86,16 +86,25 @@ export default function App() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [addedNotification, setAddedNotification] = useState<string | null>(null);
   const [language] = useState<'it' | 'en'>('it');
-  const [adminHash, setAdminHash] = useState(() =>
-    window.location.hash === '#admin' || new URLSearchParams(window.location.search).get('admin') === '1'
-  );
+  const [adminHash, setAdminHash] = useState(() => {
+    const isAdminMode =
+      window.location.hash === '#admin' ||
+      new URLSearchParams(window.location.search).get('admin') === '1';
+    if (isAdminMode) console.log('Admin mode detected:', window.location.href);
+    return isAdminMode;
+  });
 
   const { isMiniApp, haptic, notify } = useTelegram();
 
   const t = translations[language];
 
+  const isAdminMode = () =>
+    window.location.hash === '#admin' ||
+    new URLSearchParams(window.location.search).get('admin') === '1';
+
   useEffect(() => {
-    const handler = () => setAdminHash(window.location.hash === '#admin');
+    setAdminHash(isAdminMode());
+    const handler = () => setAdminHash(isAdminMode());
     window.addEventListener('hashchange', handler);
     return () => window.removeEventListener('hashchange', handler);
   }, []);

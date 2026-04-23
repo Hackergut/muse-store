@@ -42,7 +42,7 @@ function formatOrderMessage(order) {
 // BOT COMMANDS
 bot.command('start', async (ctx) => {
   const name = ctx.from?.first_name || 'Cliente';
-  const url = process.env.FRONTEND_URL || 'https://muse-store-pi.vercel.app';
+  const url = process.env.FRONTEND_URL || 'https://dist-silk-rho-56.vercel.app';
 
   await ctx.reply(
     `👋 Ciao ${name}!\n\nBenvenuto in MUSE EXCLUSIVE STORE.\n\nTocca il bottone sotto per aprire il catalogo.`,
@@ -62,7 +62,7 @@ bot.command('start', async (ctx) => {
 });
 
 bot.command('admin', async (ctx) => {
-  const url = `${process.env.FRONTEND_URL || 'https://muse-store-pi.vercel.app'}/?admin=1`;
+  const url = `${process.env.FRONTEND_URL || 'https://dist-silk-rho-56.vercel.app'}/?admin=1`;
 
   await ctx.reply(
     '🔐 Pannello Admin MUSE\n\nClicca il bottone sotto per gestire prodotti e categorie.',
@@ -91,10 +91,8 @@ bot.on('message', async (ctx) => {
     const order = JSON.parse(webAppData);
     const formatted = formatOrderMessage(order);
 
-    if (ADMIN_CHAT_ID) {
-      await bot.telegram.sendMessage(ADMIN_CHAT_ID, formatted, { parse_mode: 'HTML' });
-    }
-
+    const target = ADMIN_CHAT_ID || ctx.chat.id;
+    await bot.telegram.sendMessage(target, formatted, { parse_mode: 'HTML' });
     await ctx.reply('✅ Ordine ricevuto! Ti contatteremo presto su Telegram per la conferma.');
   } catch (err) {
     console.error('Failed to process order:', err);
@@ -145,7 +143,7 @@ async function start() {
 
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    console.log(`Admin orders to: ${ADMIN_CHAT_ID || 'NOT SET'}`);
+    console.log(`Orders will be sent to: ${ADMIN_CHAT_ID || 'NO ADMIN SET'}`);
   });
 }
 

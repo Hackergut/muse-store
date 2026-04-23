@@ -25,25 +25,20 @@ export default function AdminPanel({ onProductsChange }: AdminPanelProps) {
   const [activeSection, setActiveSection] = useState<'products' | 'categories'>('products');
   const [productTab, setProductTab] = useState<'list' | 'form'>('list');
   const [searchTerm, setSearchTerm] = useState('');
-
   const [customCategories, setCustomCategories] = useState<{ id: string; name: string }[]>(() => {
     try { const s = localStorage.getItem('muse-categories'); return s ? JSON.parse(s) : DEFAULT_CATEGORIES; }
     catch { return DEFAULT_CATEGORIES; }
   });
   const [catForm, setCatForm] = useState({ id: '', name: '' });
   const [catEditIndex, setCatEditIndex] = useState<number | null>(null);
-
   const [imgPreview, setImgPreview] = useState<string>('');
   const [imgFileName, setImgFileName] = useState<string>('');
-
   const fileInputRef = useRef<HTMLInputElement>(null);
-
   const correctPassword = 'muse2026';
 
   useEffect(() => {
     localStorage.setItem('muse-categories', JSON.stringify(customCategories));
   }, [customCategories]);
-
 
   useEffect(() => {
     const saved = localStorage.getItem('muse-products');
@@ -107,7 +102,6 @@ export default function AdminPanel({ onProductsChange }: AdminPanelProps) {
       badge: String(fd.get('badge') || '') || undefined,
       isNew: fd.get('isNew') === 'on',
     };
-
     setProducts((prev) => {
       const exists = prev.find((p) => p.id === product.id);
       const updated = exists
@@ -178,13 +172,13 @@ export default function AdminPanel({ onProductsChange }: AdminPanelProps) {
 
   if (!authenticated) {
     return (
-      <div className='min-h-screen bg-[#0a0a0a] flex items-center justify-center p-4'>
+      <div className='min-h-screen bg-[#0a0a0a] flex items-center justify-center p-6'>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className='w-full max-w-sm bg-[#111] border border-gucci-700/20 rounded-lg p-6'
+          className='w-full max-w-xs bg-[#111] border border-gucci-700/20 rounded-xl p-6'
         >
-          <h2 className='text-white text-xl tracking-[0.1em] uppercase mb-6 text-center font-light'>
+          <h2 className='text-white text-lg tracking-[0.1em] uppercase mb-6 text-center font-light'>
             Admin Access
           </h2>
           <form onSubmit={handleLogin} className='space-y-4'>
@@ -193,13 +187,13 @@ export default function AdminPanel({ onProductsChange }: AdminPanelProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder='Password'
-              className='w-full px-4 py-3 bg-[#0a0a0a] border border-gucci-700/20 rounded text-gray-300 text-sm placeholder-gray-600 focus:outline-none focus:border-gucci-600/50 transition-colors'
+              className='w-full px-4 py-3 bg-[#0a0a0a] border border-gucci-700/20 rounded-lg text-gray-300 text-sm placeholder-gray-600 focus:outline-none focus:border-gucci-600/50 transition-colors'
             />
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type='submit'
-              className='w-full px-6 py-3 bg-gradient-to-r from-gucci-700 to-gucci-600 text-white text-xs tracking-[0.1em] uppercase rounded hover:from-gucci-600 hover:to-gucci-500 transition-all duration-300 shadow-lg shadow-gucci-900/30'
+              className='w-full px-4 py-3 bg-gradient-to-r from-gucci-700 to-gucci-600 text-white text-xs tracking-[0.1em] uppercase rounded-lg hover:from-gucci-600 hover:to-gucci-500 transition-all duration-300 shadow-lg shadow-gucci-900/30'
             >
               Accedi
             </motion.button>
@@ -210,88 +204,82 @@ export default function AdminPanel({ onProductsChange }: AdminPanelProps) {
   }
 
   return (
-    <div className='min-h-screen bg-[#0a0a0a] text-white'>
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 py-8'>
-        <div className='flex items-center justify-between mb-6'>
-          <h1 className='text-2xl tracking-[0.1em] uppercase font-light'>Pannello Admin</h1>
-          <div className='flex gap-3'>
+    <div className='min-h-screen bg-[#0a0a0a] text-white pb-24'>
+      <div className='sticky top-0 z-10 bg-[#0a0a0a]/95 backdrop-blur border-b border-gucci-700/20 px-4 py-3'>
+        <div className='flex items-center justify-between'>
+          <h1 className='text-base tracking-[0.1em] uppercase font-light'>Admin</h1>
+          <div className='flex gap-2'>
             <button
               onClick={() => { setActiveSection('products'); setProductTab('list'); }}
-              className={`px-4 py-2 text-xs tracking-[0.1em] uppercase rounded transition-all ${activeSection === 'products' ? 'bg-gucci-600 text-white' : 'border border-gucci-700/20 text-gray-400 hover:border-gucci-600/50'}`}
+              className={`px-3 py-1.5 text-[10px] tracking-[0.1em] uppercase rounded-lg transition-all ${activeSection === 'products' ? 'bg-gucci-600 text-white' : 'border border-gucci-700/30 text-gray-400'}`}
             >
               Prodotti
             </button>
             <button
               onClick={() => setActiveSection('categories')}
-              className={`px-4 py-2 text-xs tracking-[0.1em] uppercase rounded transition-all ${activeSection === 'categories' ? 'bg-gucci-600 text-white' : 'border border-gucci-700/20 text-gray-400 hover:border-gucci-600/50'}`}
+              className={`px-3 py-1.5 text-[10px] tracking-[0.1em] uppercase rounded-lg transition-all ${activeSection === 'categories' ? 'bg-gucci-600 text-white' : 'border border-gucci-700/30 text-gray-400'}`}
             >
               Categorie
             </button>
           </div>
         </div>
+      </div>
 
+      <div className='px-3 py-4'>
         <AnimatePresence mode='wait'>
           {activeSection === 'products' && (
             <motion.div key='products' initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               {productTab === 'list' && (
                 <>
-                  <div className='flex items-center justify-between mb-6'>
+                  <div className='flex gap-2 mb-4'>
                     <input
                       type='text'
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       placeholder='Cerca prodotti...'
-                      className='px-4 py-2 bg-[#111] border border-gucci-700/20 rounded text-gray-300 text-xs placeholder-gray-600 focus:outline-none focus:border-gucci-600/50'
+                      className='flex-1 px-3 py-2 bg-[#111] border border-gucci-700/20 rounded-lg text-gray-300 text-xs placeholder-gray-600 focus:outline-none focus:border-gucci-600/50'
                     />
                     <button
                       onClick={startNew}
-                      className='px-4 py-2 bg-gradient-to-r from-gucci-700 to-gucci-600 text-white text-xs tracking-[0.1em] uppercase rounded hover:from-gucci-600 hover:to-gucci-500 transition-all duration-300'
+                      className='px-3 py-2 bg-gucci-600 text-white text-[10px] tracking-[0.1em] uppercase rounded-lg'
                     >
-                      + Nuovo Prodotto
+                      + Nuovo
                     </button>
                   </div>
-                  <div className='space-y-3'>
-                    <div className='grid grid-cols-[60px_1fr_100px_100px_80px_80px_80px_60px_40px] gap-3 text-[10px] tracking-[0.1em] uppercase text-gray-500 border-b border-gucci-700/20 pb-3 px-3 items-center'>
-                      <div>Img</div>
-                      <div>Nome</div>
-                      <div>Brand</div>
-                      <div>Categoria</div>
-                      <div>Prezzo</div>
-                      <div>Sconto</div>
-                      <div>Badge</div>
-                      <div>Nuovo</div>
-                      <div />
-                    </div>
+
+                  <div className='space-y-2'>
                     {filtered.map((product) => (
                       <motion.div
                         key={product.id}
                         layout
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className='grid grid-cols-[60px_1fr_100px_100px_80px_80px_80px_60px_40px] gap-3 items-center bg-[#111] border border-gucci-700/10 rounded px-3 py-2 hover:border-gucci-600/30 transition-colors'
+                        className='bg-[#111] border border-gucci-700/10 rounded-xl p-3 active:border-gucci-600/30 transition-colors'
                       >
-                        <div className='w-12 h-12 rounded overflow-hidden bg-[#0a0a0a] flex items-center justify-center'>
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                            className='w-full h-full object-cover'
-                            loading='lazy'
-                          />
+                        <div className='flex gap-3'>
+                          <div className='w-14 h-14 rounded-lg overflow-hidden bg-[#0a0a0a] flex-shrink-0'>
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              className='w-full h-full object-cover'
+                              loading='lazy'
+                            />
+                          </div>
+                          <div className='flex-1 min-w-0'>
+                            <div className='font-medium text-sm text-gray-200 truncate'>{product.name}</div>
+                            <div className='text-[10px] text-gray-500 mt-0.5'>{product.brand} • {product.category}</div>
+                            <div className='flex items-center gap-2 mt-1'>
+                              <span className='text-xs text-gucci-400'>€{product.price.toLocaleString('it-IT', { minimumFractionDigits: 2 })}</span>
+                              {product.originalPrice && <span className='text-[10px] text-gray-600 line-through'>€{product.originalPrice}</span>}
+                              {product.isNew && <span className='text-[9px] bg-gucci-600/20 text-gucci-400 px-1.5 py-0.5 rounded'>NUOVO</span>}
+                            </div>
+                          </div>
                         </div>
-                        <div className='text-sm text-gray-200 truncate'>{product.name}</div>
-                        <div className='text-xs text-gray-400'>{product.brand}</div>
-                        <div className='text-xs text-gray-400'>{product.category}</div>
-                        <div className='text-xs text-gucci-400'>€{product.price.toLocaleString('it-IT', { minimumFractionDigits: 2 })}</div>
-                        <div className='text-xs text-gucci-400'>
-                          {product.originalPrice ? `€${product.originalPrice}` : '-'}
-                        </div>
-                        <div className='text-xs text-gucci-400'>{product.badge || '-'}</div>
-                        <div className='text-xs'>{product.isNew ? 'Sì' : 'No'}</div>
-                        <div className='flex gap-2'>
-                          <button onClick={() => startEdit(product)} className='text-gucci-400 hover:text-white transition-colors text-xs'>
+                        <div className='flex gap-2 mt-3'>
+                          <button onClick={() => startEdit(product)} className='flex-1 py-1.5 bg-[#1a1a1a] border border-gucci-700/20 rounded-lg text-gucci-400 text-xs'>
                             Modifica
                           </button>
-                          <button onClick={() => handleDelete(product.id)} className='text-red-400 hover:text-red-300 transition-colors text-xs'>
+                          <button onClick={() => handleDelete(product.id)} className='flex-1 py-1.5 bg-[#1a1a1a] border border-red-900/20 rounded-lg text-red-400 text-xs'>
                             Elimina
                           </button>
                         </div>
@@ -307,163 +295,164 @@ export default function AdminPanel({ onProductsChange }: AdminPanelProps) {
               {productTab === 'form' && (
                 <motion.div
                   key='form'
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0 }}
-                  className='max-w-3xl'
+                  className='pb-6'
                 >
                   <button
                     onClick={() => { resetForm(); setProductTab('list'); }}
-                    className='mb-4 px-4 py-2 border border-gucci-700/20 text-gray-400 text-xs tracking-[0.1em] uppercase rounded hover:border-gucci-600/50 transition-all'
+                    className='mb-4 px-3 py-2 border border-gucci-700/20 text-gray-400 text-xs tracking-[0.1em] uppercase rounded-lg'
                   >
-                    ← Torna alla lista
+                    ← Lista Prodotti
                   </button>
-                  <form onSubmit={handleSave} className='bg-[#111] border border-gucci-700/20 rounded-lg p-6 space-y-6'>
-                    <h3 className='text-sm tracking-[0.1em] uppercase text-gucci-400 mb-4'>
+
+                  <form onSubmit={handleSave} className='bg-[#111] border border-gucci-700/20 rounded-xl p-4 space-y-5'>
+                    <h3 className='text-xs tracking-[0.1em] uppercase text-gucci-400'>
                       {editingProduct ? 'Modifica Prodotto' : 'Nuovo Prodotto'}
                     </h3>
                     <input type='hidden' name='id' value={editingProduct?.id || ''} />
 
-                    <div className='flex gap-6'>
-                      <div className='flex-shrink-0'>
-                        <label className='block text-[10px] tracking-[0.1em] uppercase text-gray-500 mb-2'>Immagine</label>
-                        <div
-                          onClick={() => fileInputRef.current?.click()}
-                          className='w-40 h-40 rounded border border-gucci-700/20 bg-[#0a0a0a] flex items-center justify-center cursor-pointer hover:border-gucci-600/50 transition-colors overflow-hidden relative'
+                    <div className='flex flex-col items-center'>
+                      <label className='block text-[10px] tracking-[0.1em] uppercase text-gray-500 mb-2 w-full'>Immagine</label>
+                      <div
+                        onClick={() => fileInputRef.current?.click()}
+                        className='w-full max-w-[200px] aspect-square rounded-xl border border-gucci-700/20 bg-[#0a0a0a] flex items-center justify-center cursor-pointer hover:border-gucci-600/50 transition-colors overflow-hidden'
+                      >
+                        {imgPreview ? (
+                          <img src={imgPreview} alt='Preview' className='w-full h-full object-cover' />
+                        ) : (
+                          <span className='text-gray-600 text-xs text-center px-2'>Clicca per caricare</span>
+                        )}
+                        <input
+                          ref={fileInputRef}
+                          type='file'
+                          accept='image/*'
+                          onChange={handleImageUpload}
+                          className='hidden'
+                        />
+                      </div>
+                      {imgFileName && <p className='text-[10px] text-gray-500 mt-2'>{imgFileName}</p>}
+                      {(imgPreview || editingProduct?.image) && (
+                        <button
+                          type='button'
+                          onClick={() => { setImgPreview(''); setImgFileName(''); if (fileInputRef.current) fileInputRef.current.value = ''; }}
+                          className='text-[10px] text-red-400 mt-2 underline'
                         >
-                          {imgPreview ? (
-                            <img src={imgPreview} alt='Preview' className='w-full h-full object-cover' />
-                          ) : (
-                            <span className='text-gray-600 text-xs text-center px-2'>Clicca per caricare</span>
-                          )}
-                          <input
-                            ref={fileInputRef}
-                            type='file'
-                            accept='image/*'
-                            onChange={handleImageUpload}
-                            className='hidden'
-                          />
-                        </div>
-                        {imgFileName && (
-                          <p className='text-[10px] text-gray-500 mt-2 truncate max-w-[160px]'>{imgFileName}</p>
-                        )}
-                        {(imgPreview || editingProduct?.image) && (
-                          <button
-                            type='button'
-                            onClick={() => { setImgPreview(''); setImgFileName(''); if (fileInputRef.current) fileInputRef.current.value = ''; }}
-                            className='text-[10px] text-red-400 mt-1 underline'
-                          >
-                            Rimuovi immagine
-                          </button>
-                        )}
+                          Rimuovi
+                        </button>
+                      )}
+                    </div>
+
+                    <div className='space-y-4'>
+                      <div>
+                        <label className='block text-[10px] tracking-[0.1em] uppercase text-gray-500 mb-1'>Nome</label>
+                        <input
+                          name='name'
+                          defaultValue={editingProduct?.name || ''}
+                          required
+                          className='w-full px-3 py-2.5 bg-[#0a0a0a] border border-gucci-700/20 rounded-lg text-gray-300 text-sm focus:outline-none focus:border-gucci-600/50'
+                        />
                       </div>
 
-                      <div className='flex-1 space-y-4'>
-                        <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
-                          <div>
-                            <label className='block text-[10px] tracking-[0.1em] uppercase text-gray-500 mb-1'>Nome</label>
-                            <input
-                              name='name'
-                              defaultValue={editingProduct?.name || ''}
-                              required
-                              className='w-full px-3 py-2 bg-[#0a0a0a] border border-gucci-700/20 rounded text-gray-300 text-sm focus:outline-none focus:border-gucci-600/50'
-                            />
-                          </div>
-                          <div>
-                            <label className='block text-[10px] tracking-[0.1em] uppercase text-gray-500 mb-1'>Brand</label>
-                            <select
-                              name='brand'
-                              defaultValue={editingProduct?.brand || 'Gucci'}
-                              className='w-full px-3 py-2 bg-[#0a0a0a] border border-gucci-700/20 rounded text-gray-300 text-sm focus:outline-none focus:border-gucci-600/50'
-                            >
-                              {brands.map((b) => (
-                                <option key={b} value={b}>{b}</option>
-                              ))}
-                            </select>
-                          </div>
-                          <div>
-                            <label className='block text-[10px] tracking-[0.1em] uppercase text-gray-500 mb-1'>Categoria</label>
-                            <select
-                              name='category'
-                              defaultValue={editingProduct?.category || 'bags'}
-                              className='w-full px-3 py-2 bg-[#0a0a0a] border border-gucci-700/20 rounded text-gray-300 text-sm focus:outline-none focus:border-gucci-600/50'
-                            >
-                              {customCategories.map((c) => (
-                                <option key={c.id} value={c.id}>{c.name}</option>
-                              ))}
-                            </select>
-                          </div>
-                          <div>
-                            <label className='block text-[10px] tracking-[0.1em] uppercase text-gray-500 mb-1'>Prezzo (€)</label>
-                            <input
-                              name='price'
-                              type='number'
-                              defaultValue={editingProduct?.price || ''}
-                              required
-                              className='w-full px-3 py-2 bg-[#0a0a0a] border border-gucci-700/20 rounded text-gray-300 text-sm focus:outline-none focus:border-gucci-600/50'
-                            />
-                          </div>
-                          <div>
-                            <label className='block text-[10px] tracking-[0.1em] uppercase text-gray-500 mb-1'>Prezzo Originale (€)</label>
-                            <input
-                              name='originalPrice'
-                              type='number'
-                              defaultValue={editingProduct?.originalPrice || ''}
-                              className='w-full px-3 py-2 bg-[#0a0a0a] border border-gucci-700/20 rounded text-gray-300 text-sm focus:outline-none focus:border-gucci-600/50'
-                            />
-                          </div>
-                          <div>
-                            <label className='block text-[10px] tracking-[0.1em] uppercase text-gray-500 mb-1'>Badge</label>
-                            <input
-                              name='badge'
-                              defaultValue={editingProduct?.badge || ''}
-                              placeholder='Es: Best Seller'
-                              className='w-full px-3 py-2 bg-[#0a0a0a] border border-gucci-700/20 rounded text-gray-300 text-sm focus:outline-none focus:border-gucci-600/50'
-                            />
-                          </div>
-                          <div className='flex items-end'>
-                            <label className='flex items-center gap-3 cursor-pointer'>
-                              <input
-                                name='isNew'
-                                type='checkbox'
-                                defaultChecked={editingProduct?.isNew || false}
-                                className='w-4 h-4 accent-gucci-600'
-                              />
-                              <span className='text-xs text-gray-400'>Nuovo Arrivo</span>
-                            </label>
-                          </div>
+                      <div className='grid grid-cols-2 gap-3'>
+                        <div>
+                          <label className='block text-[10px] tracking-[0.1em] uppercase text-gray-500 mb-1'>Brand</label>
+                          <select
+                            name='brand'
+                            defaultValue={editingProduct?.brand || 'Gucci'}
+                            className='w-full px-3 py-2.5 bg-[#0a0a0a] border border-gucci-700/20 rounded-lg text-gray-300 text-sm focus:outline-none focus:border-gucci-600/50'
+                          >
+                            {brands.map((b) => (
+                              <option key={b} value={b}>{b}</option>
+                            ))}
+                          </select>
                         </div>
                         <div>
-                          <label className='block text-[10px] tracking-[0.1em] uppercase text-gray-500 mb-1'>Descrizione</label>
-                          <textarea
-                            name='description'
-                            defaultValue={editingProduct?.description || ''}
-                            rows={3}
-                            className='w-full px-3 py-2 bg-[#0a0a0a] border border-gucci-700/20 rounded text-gray-300 text-sm focus:outline-none focus:border-gucci-600/50'
-                          />
-                        </div>
-
-                        {/* Fallback hidden image input for formData */}
-                        <input type='hidden' name='image' value={imgPreview || editingProduct?.image || ''} />
-
-                        <div className='flex gap-4 pt-2'>
-                          <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            type='submit'
-                            className='px-6 py-3 bg-gradient-to-r from-gucci-700 to-gucci-600 text-white text-xs tracking-[0.1em] uppercase rounded hover:from-gucci-600 hover:to-gucci-500 transition-all duration-300 shadow-lg shadow-gucci-900/30'
+                          <label className='block text-[10px] tracking-[0.1em] uppercase text-gray-500 mb-1'>Categoria</label>
+                          <select
+                            name='category'
+                            defaultValue={editingProduct?.category || 'bags'}
+                            className='w-full px-3 py-2.5 bg-[#0a0a0a] border border-gucci-700/20 rounded-lg text-gray-300 text-sm focus:outline-none focus:border-gucci-600/50'
                           >
-                            {editingProduct ? 'Salva Modifiche' : 'Crea Prodotto'}
-                          </motion.button>
-                          <button
-                            type='button'
-                            onClick={() => { resetForm(); setProductTab('list'); }}
-                            className='px-6 py-3 border border-gucci-700/20 text-gray-400 text-xs tracking-[0.1em] uppercase rounded hover:border-gucci-600/50 transition-all duration-300'
-                          >
-                            Annulla
-                          </button>
+                            {customCategories.map((c) => (
+                              <option key={c.id} value={c.id}>{c.name}</option>
+                            ))}
+                          </select>
                         </div>
                       </div>
+
+                      <div className='grid grid-cols-2 gap-3'>
+                        <div>
+                          <label className='block text-[10px] tracking-[0.1em] uppercase text-gray-500 mb-1'>Prezzo €</label>
+                          <input
+                            name='price'
+                            type='number'
+                            defaultValue={editingProduct?.price || ''}
+                            required
+                            className='w-full px-3 py-2.5 bg-[#0a0a0a] border border-gucci-700/20 rounded-lg text-gray-300 text-sm focus:outline-none focus:border-gucci-600/50'
+                          />
+                        </div>
+                        <div>
+                          <label className='block text-[10px] tracking-[0.1em] uppercase text-gray-500 mb-1'>Prezzo Originale €</label>
+                          <input
+                            name='originalPrice'
+                            type='number'
+                            defaultValue={editingProduct?.originalPrice || ''}
+                            className='w-full px-3 py-2.5 bg-[#0a0a0a] border border-gucci-700/20 rounded-lg text-gray-300 text-sm focus:outline-none focus:border-gucci-600/50'
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className='block text-[10px] tracking-[0.1em] uppercase text-gray-500 mb-1'>Badge</label>
+                        <input
+                          name='badge'
+                          defaultValue={editingProduct?.badge || ''}
+                          placeholder='Es: Best Seller'
+                          className='w-full px-3 py-2.5 bg-[#0a0a0a] border border-gucci-700/20 rounded-lg text-gray-300 text-sm focus:outline-none focus:border-gucci-600/50'
+                        />
+                      </div>
+
+                      <label className='flex items-center gap-3 cursor-pointer'>
+                        <input
+                          name='isNew'
+                          type='checkbox'
+                          defaultChecked={editingProduct?.isNew || false}
+                          className='w-5 h-5 accent-gucci-600'
+                        />
+                        <span className='text-xs text-gray-400'>Nuovo Arrivo</span>
+                      </label>
+
+                      <div>
+                        <label className='block text-[10px] tracking-[0.1em] uppercase text-gray-500 mb-1'>Descrizione</label>
+                        <textarea
+                          name='description'
+                          defaultValue={editingProduct?.description || ''}
+                          rows={3}
+                          className='w-full px-3 py-2.5 bg-[#0a0a0a] border border-gucci-700/20 rounded-lg text-gray-300 text-sm focus:outline-none focus:border-gucci-600/50'
+                        />
+                      </div>
+
+                      <input type='hidden' name='image' value={imgPreview || editingProduct?.image || ''} />
+                    </div>
+
+                    <div className='flex gap-3 pt-2'>
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        type='submit'
+                        className='flex-1 py-3 bg-gradient-to-r from-gucci-700 to-gucci-600 text-white text-xs tracking-[0.1em] uppercase rounded-xl hover:from-gucci-600 hover:to-gucci-500 transition-all duration-300 shadow-lg shadow-gucci-900/30'
+                      >
+                        {editingProduct ? 'Salva Modifiche' : 'Crea Prodotto'}
+                      </motion.button>
+                      <button
+                        type='button'
+                        onClick={() => { resetForm(); setProductTab('list'); }}
+                        className='flex-1 py-3 border border-gucci-700/20 text-gray-400 text-xs tracking-[0.1em] uppercase rounded-xl hover:border-gucci-600/50 transition-all duration-300'
+                      >
+                        Annulla
+                      </button>
                     </div>
                   </form>
                 </motion.div>
@@ -473,63 +462,63 @@ export default function AdminPanel({ onProductsChange }: AdminPanelProps) {
 
           {activeSection === 'categories' && (
             <motion.div key='categories' initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
-                <div className='lg:col-span-2'>
-                  <h3 className='text-sm tracking-[0.1em] uppercase text-gucci-400 mb-4'>Categorie</h3>
-                  <div className='space-y-2'>
-                    {customCategories.map((cat, index) => {
-                      const usedCount = products.filter((p) => p.category === cat.id).length;
-                      return (
-                        <div
-                          key={cat.id}
-                          className='flex items-center justify-between bg-[#111] border border-gucci-700/10 rounded px-4 py-3 hover:border-gucci-600/30 transition-colors'
-                        >
-                          <div>
-                            <div className='text-sm text-gray-200'>{cat.name}</div>
-                            <div className='text-[10px] text-gray-500'>ID: {cat.id} • {usedCount} prodotti</div>
-                          </div>
-                          <div className='flex gap-3'>
-                            <button onClick={() => handleEditCategory(index)} className='text-gucci-400 hover:text-white text-xs'>Modifica</button>
-                            <button onClick={() => handleDelCategory(index)} className='text-red-400 hover:text-red-300 text-xs'>Elimina</button>
-                          </div>
+              <div className='space-y-3 mb-6'>
+                {customCategories.map((cat, index) => {
+                  const usedCount = products.filter((p) => p.category === cat.id).length;
+                  return (
+                    <div
+                      key={cat.id}
+                      className='bg-[#111] border border-gucci-700/10 rounded-xl px-4 py-3 active:border-gucci-600/30 transition-colors'
+                    >
+                      <div className='flex items-center justify-between'>
+                        <div>
+                          <div className='text-sm text-gray-200'>{cat.name}</div>
+                          <div className='text-[10px] text-gray-500'>ID: {cat.id} • {usedCount} prodotti</div>
                         </div>
-                      );
-                    })}
+                        <div className='flex gap-2'>
+                          <button onClick={() => handleEditCategory(index)} className='px-3 py-1.5 bg-[#1a1a1a] border border-gucci-700/20 rounded-lg text-gucci-400 text-[10px]'>Modifica</button>
+                          <button onClick={() => handleDelCategory(index)} className='px-3 py-1.5 bg-[#1a1a1a] border border-red-900/20 rounded-lg text-red-400 text-[10px]'>Elimina</button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className='bg-[#111] border border-gucci-700/20 rounded-xl p-4'>
+                <h3 className='text-xs tracking-[0.1em] uppercase text-gucci-400 mb-4'>
+                  {catEditIndex !== null ? 'Modifica Categoria' : 'Nuova Categoria'}
+                </h3>
+                <div className='space-y-3'>
+                  <div>
+                    <label className='block text-[10px] tracking-[0.1em] uppercase text-gray-500 mb-1'>ID (slug)</label>
+                    <input
+                      value={catForm.id}
+                      onChange={(e) => setCatForm((prev) => ({ ...prev, id: e.target.value }))}
+                      placeholder='es. bags'
+                      className='w-full px-3 py-2.5 bg-[#0a0a0a] border border-gucci-700/20 rounded-lg text-gray-300 text-sm focus:outline-none focus:border-gucci-600/50'
+                    />
                   </div>
-                </div>
-                <div className='bg-[#111] border border-gucci-700/20 rounded-lg p-6'>
-                  <h3 className='text-sm tracking-[0.1em] uppercase text-gucci-400 mb-4'>
-                    {catEditIndex !== null ? 'Modifica Categoria' : 'Nuova Categoria'}
-                  </h3>
-                  <div className='space-y-4'>
-                    <div>
-                      <label className='block text-[10px] tracking-[0.1em] uppercase text-gray-500 mb-1'>ID (slug)</label>
-                      <input
-                        value={catForm.id}
-                        onChange={(e) => setCatForm((prev) => ({ ...prev, id: e.target.value }))}
-                        placeholder='es. bags, wallets'
-                        className='w-full px-3 py-2 bg-[#0a0a0a] border border-gucci-700/20 rounded text-gray-300 text-sm focus:outline-none focus:border-gucci-600/50'
-                      />
-                    </div>
-                    <div>
-                      <label className='block text-[10px] tracking-[0.1em] uppercase text-gray-500 mb-1'>Nome</label>
-                      <input
-                        value={catForm.name}
-                        onChange={(e) => setCatForm((prev) => ({ ...prev, name: e.target.value }))}
-                        placeholder='es. Borse'
-                        className='w-full px-3 py-2 bg-[#0a0a0a] border border-gucci-700/20 rounded text-gray-300 text-sm focus:outline-none focus:border-gucci-600/50'
-                      />
-                    </div>
+                  <div>
+                    <label className='block text-[10px] tracking-[0.1em] uppercase text-gray-500 mb-1'>Nome</label>
+                    <input
+                      value={catForm.name}
+                      onChange={(e) => setCatForm((prev) => ({ ...prev, name: e.target.value }))}
+                      placeholder='es. Borse'
+                      className='w-full px-3 py-2.5 bg-[#0a0a0a] border border-gucci-700/20 rounded-lg text-gray-300 text-sm focus:outline-none focus:border-gucci-600/50'
+                    />
+                  </div>
+                  <div className='flex gap-3'>
                     <button
                       onClick={handleSaveCategory}
-                      className='w-full px-4 py-2 bg-gradient-to-r from-gucci-700 to-gucci-600 text-white text-xs tracking-[0.1em] uppercase rounded hover:from-gucci-600 hover:to-gucci-500 transition-all'
+                      className='flex-1 py-2.5 bg-gradient-to-r from-gucci-700 to-gucci-600 text-white text-[10px] tracking-[0.1em] uppercase rounded-xl'
                     >
-                      {catEditIndex !== null ? 'Salva Modifiche' : 'Crea Categoria'}
+                      {catEditIndex !== null ? 'Salva' : 'Crea'}
                     </button>
                     {catEditIndex !== null && (
                       <button
                         onClick={() => { setCatForm({ id: '', name: '' }); setCatEditIndex(null); }}
-                        className='w-full px-4 py-2 border border-gucci-700/20 text-gray-400 text-xs tracking-[0.1em] uppercase rounded hover:border-gucci-600/50 transition-all'
+                        className='flex-1 py-2.5 border border-gucci-700/20 text-gray-400 text-[10px] tracking-[0.1em] uppercase rounded-xl'
                       >
                         Annulla
                       </button>
