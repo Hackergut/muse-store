@@ -1,7 +1,7 @@
-import express from 'express';
-import { Telegraf } from 'telegraf';
-import dotenv from 'dotenv';
-import cors from 'cors';
+const express = require('express');
+const { Telegraf } = require('telegraf');
+const dotenv = require('dotenv');
+const cors = require('cors');
 
 dotenv.config();
 
@@ -15,25 +15,13 @@ if (!BOT_TOKEN) {
 }
 
 const bot = new Telegraf(BOT_TOKEN);
-const app = express.default();
+const app = express();
 
-app.use(cors.default());
-app.use(express.default.json());
+app.use(cors());
+app.use(express.json());
 
-interface OrderItem {
-  name: string;
-  brand: string;
-  qty: number;
-  price: number;
-}
-
-interface OrderPayload {
-  items: OrderItem[];
-  total: number;
-}
-
-function formatOrderMessage(order: OrderPayload): string {
-  const lines: string[] = [];
+function formatOrderMessage(order) {
+  const lines = [];
   lines.push('🛍 NUOVO ORDINE MUSE');
   lines.push('');
 
@@ -51,8 +39,7 @@ function formatOrderMessage(order: OrderPayload): string {
   return lines.join('\n');
 }
 
-// ========== BOT COMMANDS ==========
-
+// BOT COMMANDS
 bot.command('start', async (ctx) => {
   const name = ctx.from?.first_name || 'Cliente';
   const url = process.env.FRONTEND_URL || 'https://muse-store-pi.vercel.app';
@@ -78,7 +65,7 @@ bot.command('admin', async (ctx) => {
   const url = `${process.env.FRONTEND_URL || 'https://muse-store-pi.vercel.app'}/?admin=1`;
 
   await ctx.reply(
-    `🔐 Pannello Admin MUSE\n\nClicca il bottone sotto per gestire prodotti e categorie.`,
+    '🔐 Pannello Admin MUSE\n\nClicca il bottone sotto per gestire prodotti e categorie.',
     {
       reply_markup: {
         inline_keyboard: [
@@ -96,12 +83,12 @@ bot.command('admin', async (ctx) => {
 
 // Ricevere ordini dalla Mini App via tg.sendData()
 bot.on('message', async (ctx) => {
-  const msg = ctx.message as any;
+  const msg = ctx.message;
   const webAppData = msg.web_app_data?.data;
   if (!webAppData) return;
 
   try {
-    const order: OrderPayload = JSON.parse(webAppData);
+    const order = JSON.parse(webAppData);
     const formatted = formatOrderMessage(order);
 
     if (ADMIN_CHAT_ID) {
@@ -115,11 +102,10 @@ bot.on('message', async (ctx) => {
   }
 });
 
-// ========== API ENDPOINTS ==========
-
+// API ENDPOINTS
 app.post('/api/order', async (req, res) => {
   try {
-    const payload: OrderPayload = req.body;
+    const payload = req.body;
 
     if (!payload.items || payload.items.length === 0) {
       res.status(400).json({ error: 'No items in order' });
@@ -145,8 +131,7 @@ app.get('/', (_req, res) => {
   res.json({ status: 'ok', service: 'muse-telegram-bot' });
 });
 
-// ========== START ==========
-
+// START
 async function start() {
   if (process.env.WEBHOOK_URL) {
     const webhookPath = `/webhook/${process.env.WEBHOOK_SECRET || 'secret'}`;
