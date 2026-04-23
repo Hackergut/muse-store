@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+@theme {
+  --font-michroma: 'Michroma', sans-serif;
+  
+  /* Gucci Green / Army Green Palette */
+  --color-gucci-50: #e8f5e9;
+  --color-gucci-100: #c8e6c9;
+  --color-gucci-200: #a5d6a7;
+  --color-gucci-300: #81c784;
+  --color-gucci-400: #66bb6a;
+  --color-gucci-500: #4caf50;
+  --color-gucci-600: #2d5a3d;
+  --color-gucci-700: #1e3d2a;
+  --color-gucci-800: #163527;
+  --color-gucci-900: #0d201a;
+}
+
+/* Base */
+body {
+  font-family: 'Michroma', sans-serif;
+  letter-spacing: 0.02em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Animations */
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-scroll {
+  animation: scroll 30s linear infinite;
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: #0a0a0a; }
+::-webkit-scrollbar-thumb { background: #2d5a3d; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #3d7a5d; }
+
+/* Selection */
+::selection {
+  background-color: rgba(45, 90, 61, 0.4);
+  color: #fff;
+}
+
+/* Line clamp */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Safe area for mobile */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
