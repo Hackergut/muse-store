@@ -281,7 +281,7 @@ export default function AdminPanel({ onProductsChange }: AdminPanelProps) {
                         <div className='text-sm text-gray-200 truncate'>{product.name}</div>
                         <div className='text-xs text-gray-400'>{product.brand}</div>
                         <div className='text-xs text-gray-400'>{product.category}</div>
-                        <div className='text-xs text-gucci-400'>€{product.price}</div>
+                        <div className='text-xs text-gucci-400'>€{product.price.toLocaleString('it-IT', { minimumFractionDigits: 2 })}</div>
                         <div className='text-xs text-gucci-400'>
                           {product.originalPrice ? `€${product.originalPrice}` : '-'}
                         </div>

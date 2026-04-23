@@ -64,11 +64,11 @@ export default function ProductCard({ product, onAddToCart }: ProductCardProps) 
         </h3>
         <div className="flex items-center gap-2 sm:gap-3">
           <span className="text-gucci-400 text-sm sm:text-base lg:text-lg">
-            €{product.price.toLocaleString()}
+            €{product.price.toLocaleString('it-IT', { minimumFractionDigits: 2 })}
           </span>
           {product.originalPrice && (
             <span className="text-gray-600 line-through text-xs sm:text-sm">
-              €{product.originalPrice.toLocaleString()}
+              €{product.originalPrice.toLocaleString('it-IT', { minimumFractionDigits: 2 })}
             </span>
           )}
         </div>

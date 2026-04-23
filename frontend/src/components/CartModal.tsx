@@ -52,7 +52,7 @@ export default function CartModal({ isOpen, onClose, cart, onUpdateQuantity, onR
                         <div className="flex-1 min-w-0">
                           <p className="text-gucci-400/80 text-[8px] sm:text-[10px] tracking-[0.15em] uppercase">{item.brand}</p>
                           <p className="text-gray-200 text-xs sm:text-sm truncate mt-0.5">{item.name}</p>
-                          <p className="text-gucci-500 text-xs sm:text-sm mt-1">€{item.price.toLocaleString()}</p>
+                          <p className="text-gucci-500 text-xs sm:text-sm mt-1">€{item.price.toLocaleString('it-IT', { minimumFractionDigits: 2 })}</p>
                           <div className="flex items-center justify-between mt-2">
                             <div className="flex items-center border border-gucci-700/40 rounded">
                               <motion.button whileTap={{ scale: 0.9 }} onClick={() => onUpdateQuantity(item.id, item.quantity - 1)} className="px-2 py-0.5 sm:py-1 text-gucci-400 hover:bg-gucci-900/20 transition-colors text-sm">−</motion.button>
@@ -73,7 +73,7 @@ export default function CartModal({ isOpen, onClose, cart, onUpdateQuantity, onR
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="border-t border-gucci-700/30 p-4 sm:p-6 space-y-3 sm:space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-gray-400 text-xs sm:text-sm tracking-wide">{t.total}</span>
-                    <span className="text-gucci-400 text-base sm:text-lg">€{total.toLocaleString()}</span>
+                    <span className="text-gucci-400 text-base sm:text-lg">€{total.toLocaleString('it-IT', { minimumFractionDigits: 2 })}</span>
                   </div>
                   {!isMiniApp && <p className="text-gray-600 text-[10px] sm:text-xs tracking-wide text-center">Shipping &amp; taxes calculated at checkout</p>}
                   <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} onClick={onCheckout} className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-gucci-700 to-gucci-600 text-white text-[10px] sm:text-xs tracking-[0.1em] uppercase rounded hover:from-gucci-600 hover:to-gucci-500 transition-all duration-300 shadow-lg shadow-gucci-900/30">{t.checkout}</motion.button>

@@ -19,16 +19,18 @@ interface CartItem {
   quantity: number;
 }
 
+const API_URL = 'https://muse-store.onrender.com';
+
 const translations = {
   it: {
     curatedSelection: 'Selezione Curata',
     ourCollection: 'La Nostra Collezione',
-    collectionDesc: 'Esplora la nostra selezione di pezzi di lusso piu desiderati dalle case di moda piu iconiche.',
-    bestSellers: 'I Piu Venduti',
-    bestSellersDesc: 'I preferiti dei nostri clienti - qualita e stile senza compromessi.',
+    collectionDesc: 'Esplora la nostra selezione di pezzi di lusso più desiderati dalle case di moda più iconiche.',
+    bestSellers: 'I Più Venduti',
+    bestSellersDesc: 'I preferiti dei nostri clienti - qualità e stile senza compromessi.',
     shopAll: 'Vedi Tutto',
-    authenticity: 'Autenticita Garantita',
-    authenticityDesc: 'Ogni pezzo e verificato dai nostri esperti autenticatori.',
+    authenticity: 'Autenticità Garantita',
+    authenticityDesc: 'Ogni pezzo è verificato dai nostri esperti autenticatori.',
     expressShipping: 'Spedizione Express',
     expressShippingDesc: 'Spedizione express gratuita su tutti gli ordini.',
     whiteGlove: 'Servizio Premium',
@@ -42,9 +44,11 @@ const translations = {
     lang: 'IT',
     order: 'Ordina su Telegram',
     cartTitle: 'Carrello',
-    emptyCart: 'Il carrello e vuoto',
+    emptyCart: 'Il carrello è vuoto',
     total: 'Totale',
     checkout: 'Invia Ordine Telegram',
+    orderSent: 'Ordine inviato!',
+    orderError: 'Errore invio ordine.',
   },
   en: {
     curatedSelection: 'Curated Selection',
@@ -71,6 +75,8 @@ const translations = {
     emptyCart: 'Your cart is empty',
     total: 'Total',
     checkout: 'Send Telegram Order',
+    orderSent: 'Order sent!',
+    orderError: 'Error sending order.',
   },
 };
 
@@ -80,9 +86,11 @@ export default function App() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [addedNotification, setAddedNotification] = useState<string | null>(null);
   const [language] = useState<'it' | 'en'>('it');
-  const [adminHash, setAdminHash] = useState(() => window.location.hash === '#admin');
+  const [adminHash, setAdminHash] = useState(() =>
+    window.location.hash === '#admin' || new URLSearchParams(window.location.search).get('admin') === '1'
+  );
 
-  const { isMiniApp, haptic, notify, sendOrder } = useTelegram();
+  const { isMiniApp, haptic, notify } = useTelegram();
 
   const t = translations[language];
 
@@ -160,16 +168,42 @@ export default function App() {
     setCart((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (cart.length === 0) return;
-    notify('success');
     const order = {
       items: cart.map((c) => ({ name: c.name, brand: c.brand, qty: c.quantity, price: c.price })),
       total: cartTotal,
     };
-    sendOrder(order);
-    setCart([]);
-    setCartOpen(false);
+
+    // 1) Prova POST al backend API
+    try {
+      const res = await fetch(`${API_URL}/api/order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(order),
+      });
+      if (res.ok) {
+        notify('success');
+        setAddedNotification(t.orderSent);
+        setCart([]);
+        setCartOpen(false);
+        return;
+      }
+    } catch {
+      // backend non raggiungibile, fallback su tg.sendData()
+    }
+
+    // 2) Fallback: tg.sendData() (funziona solo se il bot è avviato e in ascolto)
+    if (isMiniApp) {
+      notify('success');
+      (window as any).Telegram?.WebApp?.sendData?.(JSON.stringify(order));
+      setCart([]);
+      setCartOpen(false);
+    } else {
+      // Se non siamo in Telegram e il backend è down, mostra alert
+      setAddedNotification(t.orderError);
+      notify('error');
+    }
   };
 
   if (adminHash) {
@@ -226,7 +260,8 @@ export default function App() {
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-6 sm:mb-8">
             {allCategories.map((cat, index: number) => (
               <motion.button key={cat.id} initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.3, delay: index * 0.05 }} whileTap={{ scale: 0.95 }} onClick={() => setActiveCategory(cat.id)}
-                className={`px-4 sm:px-5 py-1.5 sm:py-2 text-[10px] sm:text-xs tracking-[0.1em] uppercase rounded-full transition-all duration-300 ${ activeCategory === cat.id ? 'bg-gucci-600 text-white shadow-lg' : 'text-gray-500 border border-gucci-700/30 hover:border-gucci-600/50 hover:text-gucci-400'}`}>
+                className={`px-4 sm:px-5 py-1.5 sm:py-2 text-[10px] sm:text-xs tracking-[0.1em] uppercase rounded-full transition-all duration-300 ${ activeCategory === cat.id ? 'bg-gucci-600 text-white shadow-lg' : 'text-gray-500 border border-gucci-700/30 hover:border-gucci-600/50 hover:text-gucci-400'}`}
+              >
                 {cat.name}
               </motion.button>
             ))}
@@ -278,8 +313,8 @@ export default function App() {
 
       {isMiniApp && cart.length > 0 && (
         <div className="fixed bottom-0 left-0 right-0 z-50 px-4 py-3 bg-[#111] border-t border-gucci-700/20">
-          <button onClick={() => { notify('success'); handleCheckout(); }} className="w-full py-2 bg-gucci-600 text-white text-xs tracking-[0.1em] uppercase rounded">
-            {t.checkout}: €{cartTotal}
+          <button onClick={() => { handleCheckout(); }} className="w-full py-2 bg-gucci-600 text-white text-xs tracking-[0.1em] uppercase rounded">
+            {t.checkout}: €{cartTotal.toLocaleString('it-IT', { minimumFractionDigits: 2 })}
           </button>
         </div>
       )}
@@ -288,7 +323,7 @@ export default function App() {
         {addedNotification && (
           <motion.div initial={{ opacity: 0, y: 50, x: '-50%' }} animate={{ opacity: 1, y: 0, x: '-50%' }} exit={{ opacity: 0, y: 50, x: '-50%' }} transition={{ type: 'spring', damping: 25 }} className="fixed bottom-6 sm:bottom-8 left-1/2 z-50 px-4">
             <div className="px-5 py-3 bg-[#1a1a1a] border border-gucci-700/30 rounded-lg shadow-2xl flex items-center gap-3">
-              <span className="text-gray-300 text-xs"><span className="text-gucci-400 font-semibold">{addedNotification}</span> {language === 'it' ? 'aggiunta alla borsa' : 'added to bag'}</span>
+              <span className="text-gray-300 text-xs"><span className="text-gucci-400 font-semibold">{addedNotification}</span></span>
             </div>
           </motion.div>
         )}
